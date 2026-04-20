@@ -1,0 +1,9 @@
+<div style="max-width: 1100px; margin: 0 auto; padding: 20px;">
+  <h1>Seu comentarista inteligente da Formula 1 🏎️</h1>
+  <p>Selecione uma das 10 últimas corridas para gerar análise de jornalista com Ollama.</p>
+
+  <div style="display: grid; grid-template-columns: 340px 1fr; gap: 16px; align-items: start;">
+    <app-race-list (raceSelected)="onRaceSelected($event)"></app-race-list>
+    <app-race-commentary [race]="selectedRace"></app-race-commentary>
+  </div>
+</div>

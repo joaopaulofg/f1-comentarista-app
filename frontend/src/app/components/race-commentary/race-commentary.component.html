@@ -1,0 +1,61 @@
+<div class="card">
+  <h3>Comentário do jornalista</h3>
+
+  <div *ngIf="!race">Selecione uma corrida para visualizar o comentário.</div>
+  <div *ngIf="race" class="selected-race">
+    <strong>{{ race.meeting_name }}</strong>
+    <span>{{ race.country_name }} • {{ race.circuit_short_name }}</span>
+  </div>
+
+  <div *ngIf="loading" class="progress-panel">
+    <div class="progress-header">
+      <strong>{{ progressSteps[progressIndex] }}</strong>
+      <span>Isso pode levar alguns segundos.</span>
+    </div>
+
+    <div class="progress-steps">
+      <div
+        *ngFor="let step of progressSteps; let i = index; trackBy: trackProgressStep"
+        class="progress-step"
+        [class.done]="isProgressDone(i)"
+        [class.active]="isProgressActive(i)">
+        <span class="progress-dot"></span>
+        <span>{{ step }}</span>
+      </div>
+    </div>
+
+    <div *ngIf="!data" class="loading-preview">
+      <div class="loading-column">
+        <div class="loading-label">Prévia da análise</div>
+        <div class="skeleton-line wide"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line"></div>
+      </div>
+      <div class="loading-column">
+        <div class="loading-label">Resumo da corrida</div>
+        <div class="skeleton-chip"></div>
+        <div class="skeleton-chip"></div>
+        <div class="skeleton-chip short"></div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+
+  <ng-container *ngIf="data">
+    <h4>Pódio</h4>
+    <ol>
+      <li *ngFor="let p of data.podium">{{ p.full_name }} - {{ p.team_name }}</li>
+    </ol>
+
+    <h4>Top 10</h4>
+    <ol>
+      <li *ngFor="let r of data.full_results">{{ r.position }}º {{ r.full_name }} - {{ r.team_name }}</li>
+    </ol>
+
+    <h4>Análise</h4>
+    <p class="commentary-text" [class.streaming]="loading">
+      {{ data.commentary || 'Preparando análise...' }}
+    </p>
+  </ng-container>
+</div>

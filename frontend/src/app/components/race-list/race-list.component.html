@@ -1,0 +1,14 @@
+<div class="card">
+  <h3>Últimas corridas</h3>
+
+  <div *ngIf="loading">Carregando...</div>
+  <div *ngIf="error">{{ error }}</div>
+
+  <button
+    *ngFor="let race of races"
+    style="display:block; width:100%; margin-bottom:8px; text-align:left; padding:8px;"
+    (click)="selectRace(race)">
+    <strong>{{ race.meeting_name }} ({{ race.year }})</strong><br>
+    <small>{{ race.country_name }} - {{ race.circuit_short_name }}</small>
+  </button>
+</div>
