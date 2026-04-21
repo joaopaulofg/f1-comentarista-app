@@ -5,7 +5,7 @@ from collections.abc import AsyncIterator
 import httpx
 
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen3:1.7b")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen3:0.6b")
 
 
 class OllamaClientError(RuntimeError):
@@ -14,14 +14,24 @@ class OllamaClientError(RuntimeError):
 
 def build_commentary_prompt(race_title: str, podium_text: str, top10_text: str) -> str:
     return f"""
-Você é um jornalista esportivo especialista em Fórmula 1.
-Faça um comentário em português (Brasil), com até 3 parágrafos curtos,
-sobre a corrida {race_title}.
+Você é um comentarista brasileiro de Fórmula 1.
+Escreva um comentário curto, natural e fluido sobre {race_title}, em português do Brasil.
 
-Foque em:
-1) pódio,
-2) destaques do top-10,
-3) resultado final e implicações.
+Regras obrigatórias:
+- escreva 2 parágrafos curtos
+- soe humano e jornalístico, não robótico
+- cite os 3 pilotos do pódio no primeiro parágrafo
+- cite 2 ou 3 destaques reais do top-10 no segundo parágrafo
+- use apenas os dados fornecidos
+- não invente disputa de campeonato, estratégia, ultrapassagens ou contexto externo
+- não diga frases vagas como "as implicações para o futuro" ou "a dinâmica do torneio"
+- não repita a lista completa de posições
+- prefira observações concretas sobre quem venceu, quem completou o pódio e quais equipes apareceram bem
+- mantenha entre 70 e 110 palavras no total
+
+Estrutura:
+Parágrafo 1: resumo do resultado com foco no vencedor e no pódio.
+Parágrafo 2: leitura breve do top-10, destacando 2 ou 3 nomes/equipes que chamam atenção.
 
 Pódio:
 {podium_text}

@@ -54,6 +54,31 @@ button {
   margin-bottom: 16px;
 }
 
+.progress-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.progress-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(88, 166, 255, 0.14);
+  border: 1px solid rgba(88, 166, 255, 0.24);
+  color: #c9d1d9;
+  font-size: 13px;
+}
+
+.progress-badge.subtle {
+  background: rgba(139, 148, 158, 0.12);
+  border-color: rgba(139, 148, 158, 0.18);
+  color: #8b949e;
+}
+
 .progress-step {
   display: flex;
   align-items: center;
@@ -148,6 +173,11 @@ button {
 .error-message {
   color: #ff7b72;
   margin-top: 12px;
+}
+
+.muted-placeholder {
+  color: #8b949e;
+  font-style: italic;
 }
 
 .commentary-text {

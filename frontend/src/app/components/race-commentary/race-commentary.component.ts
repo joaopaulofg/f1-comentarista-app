@@ -16,13 +16,21 @@ export class RaceCommentaryComponent implements OnChanges, OnDestroy {
   loading = false;
   error = '';
   progressIndex = 0;
+  elapsedSeconds = 0;
   readonly progressSteps = [
     'Buscando dados finais da corrida',
     'Organizando pódio e top 10',
     'Escrevendo comentário em tempo real',
   ];
+  readonly waitingMessages = [
+    'A IA está lendo o resultado final e organizando os destaques.',
+    'Montando a abertura do texto com base no pódio e no top 10.',
+    'Modelo local pensando na melhor forma de contar a corrida.',
+    'Quase lá: o comentário começa a aparecer assim que os primeiros trechos chegarem.',
+  ];
 
   private progressTimer?: number;
+  private elapsedTimer?: number;
   private activeRequestId = 0;
   private commentaryStream?: EventSource;
 
@@ -38,8 +46,10 @@ export class RaceCommentaryComponent implements OnChanges, OnDestroy {
     this.error = '';
     this.data = undefined;
     this.progressIndex = 0;
+    this.elapsedSeconds = 0;
     this.closeCommentaryStream();
     this.startProgressSimulation();
+    this.startElapsedTimer();
 
     const stream = this.apiService.createCommentaryStream(this.race.session_key);
     this.commentaryStream = stream;
@@ -80,6 +90,7 @@ export class RaceCommentaryComponent implements OnChanges, OnDestroy {
 
       this.loading = false;
       this.stopProgressSimulation();
+      this.stopElapsedTimer();
       this.closeCommentaryStream();
     });
 
@@ -105,6 +116,7 @@ export class RaceCommentaryComponent implements OnChanges, OnDestroy {
       this.error = detail;
       this.loading = false;
       this.stopProgressSimulation();
+      this.stopElapsedTimer();
       this.closeCommentaryStream();
     });
 
@@ -122,6 +134,7 @@ export class RaceCommentaryComponent implements OnChanges, OnDestroy {
         this.error = 'Conexão interrompida durante a geração do comentário.';
         this.loading = false;
         this.stopProgressSimulation();
+        this.stopElapsedTimer();
       }
 
       this.closeCommentaryStream();
@@ -130,6 +143,7 @@ export class RaceCommentaryComponent implements OnChanges, OnDestroy {
 
   ngOnDestroy(): void {
     this.stopProgressSimulation();
+    this.stopElapsedTimer();
     this.closeCommentaryStream();
   }
 
@@ -143,6 +157,43 @@ export class RaceCommentaryComponent implements OnChanges, OnDestroy {
 
   isProgressActive(index: number): boolean {
     return this.loading && index === this.progressIndex;
+  }
+
+  get loadingTitle(): string {
+    if (this.data?.commentary) {
+      return 'Recebendo trechos do comentário';
+    }
+
+    if (this.elapsedSeconds >= 20) {
+      return 'O modelo ainda está elaborando a análise';
+    }
+
+    return this.progressSteps[this.progressIndex];
+  }
+
+  get loadingHint(): string {
+    if (this.elapsedSeconds < 8) {
+      return 'Primeiro carregamos os dados da corrida e depois iniciamos a escrita.';
+    }
+
+    if (this.elapsedSeconds < 20) {
+      return 'Modelos locais podem demorar um pouco mais, mesmo para respostas curtas.';
+    }
+
+    return 'O modelo está processando...';
+  }
+
+  get waitingCommentaryText(): string {
+    const messageIndex = Math.min(
+      Math.floor(this.elapsedSeconds / 6),
+      this.waitingMessages.length - 1,
+    );
+
+    return this.waitingMessages[messageIndex];
+  }
+
+  get elapsedLabel(): string {
+    return `${this.elapsedSeconds}s decorridos`;
   }
 
   private startProgressSimulation(): void {
@@ -159,6 +210,21 @@ export class RaceCommentaryComponent implements OnChanges, OnDestroy {
     if (this.progressTimer) {
       window.clearInterval(this.progressTimer);
       this.progressTimer = undefined;
+    }
+  }
+
+  private startElapsedTimer(): void {
+    this.stopElapsedTimer();
+
+    this.elapsedTimer = window.setInterval(() => {
+      this.elapsedSeconds += 1;
+    }, 1000);
+  }
+
+  private stopElapsedTimer(): void {
+    if (this.elapsedTimer) {
+      window.clearInterval(this.elapsedTimer);
+      this.elapsedTimer = undefined;
     }
   }
 
