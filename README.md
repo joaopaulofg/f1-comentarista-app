@@ -4,7 +4,7 @@
 - **João Paulo Ferreira Gomes - 2415050023**
 - **Letícia Farias de Assis Arruda - 2415050016**
 - **Vinicius Leal de Melo - 2415050029**
-- **Giusepp - **
+- **GGiusepp de Couto Barros Júnior - 2415050045**
 
 ## Descrição do Projeto
 O **F1 Comentarista IA** é uma aplicação web que consulta dados reais de corridas de Fórmula 1 na OpenF1 e gera um comentário em português com apoio de um LLM local via Ollama.
