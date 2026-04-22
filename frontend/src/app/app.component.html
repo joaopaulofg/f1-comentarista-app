@@ -1,9 +1,15 @@
-<div style="max-width: 1100px; margin: 0 auto; padding: 20px;">
-  <h1>Seu comentarista inteligente da Formula 1 🏎️</h1>
-  <p>Selecione uma das 10 últimas corridas para gerar análise de jornalista com Ollama.</p>
+<div class="page-shell">
+  <section class="hero-panel">
+    <h1 class="hero-title">
+      <span>Seu comentarista inteligente da F1</span>
+      <span class="hero-title-icon">🏎️</span>
+    </h1>
+  </section>
 
-  <div style="display: grid; grid-template-columns: 340px 1fr; gap: 16px; align-items: start;">
-    <app-race-list (raceSelected)="onRaceSelected($event)"></app-race-list>
+  <div class="main-grid">
+    <app-race-list
+      [selectedSessionKey]="selectedRace?.session_key"
+      (raceSelected)="onRaceSelected($event)"></app-race-list>
     <app-race-commentary [race]="selectedRace"></app-race-commentary>
   </div>
 </div>

@@ -10,7 +10,6 @@
   <div *ngIf="loading" class="progress-panel">
     <div class="progress-header">
       <strong>{{ loadingTitle }}</strong>
-      <span>{{ loadingHint }}</span>
     </div>
 
     <div class="progress-meta">
@@ -56,10 +55,10 @@
     </ol>
 
     <h4>Top 10</h4>
-    <ol>
+    <ul class="plain-results-list">
       <li *ngFor="let r of data.full_results">{{ r.position }}º {{ r.full_name }} - {{ r.team_name }}</li>
       <li *ngIf="loading && data.full_results.length === 0" class="muted-placeholder">Montando a classificação final...</li>
-    </ol>
+    </ul>
 
     <h4>Análise</h4>
     <p class="commentary-text" [class.streaming]="loading">

@@ -1,14 +1,24 @@
 <div class="card">
-  <h3>Últimas corridas</h3>
+  <div class="section-heading">
+    <div>
+      <h3>Painel de corridas</h3>
+      <p>Selecione uma prova encerrada para gerar a análise.</p>
+    </div>
+    <span class="section-badge">OpenF1</span>
+  </div>
 
-  <div *ngIf="loading">Carregando...</div>
-  <div *ngIf="error">{{ error }}</div>
+  <div *ngIf="loading" class="list-status">Carregando corridas...</div>
+  <div *ngIf="error" class="error-message">{{ error }}</div>
 
   <button
     *ngFor="let race of races"
-    style="display:block; width:100%; margin-bottom:8px; text-align:left; padding:8px;"
+    class="race-option"
+    [class.active]="race.session_key === selectedSessionKey"
     (click)="selectRace(race)">
-    <strong>{{ race.meeting_name }} ({{ race.year }})</strong><br>
-    <small>{{ race.country_name }} - {{ race.circuit_short_name }}</small>
+    <span class="race-option-top">
+      <strong>{{ race.meeting_name }}</strong>
+      <span class="race-year">{{ race.year }}</span>
+    </span>
+    <span class="race-option-bottom">{{ race.country_name }} • {{ race.circuit_short_name }}</span>
   </button>
 </div>

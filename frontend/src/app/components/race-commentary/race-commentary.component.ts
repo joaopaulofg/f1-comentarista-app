@@ -171,21 +171,9 @@ export class RaceCommentaryComponent implements OnChanges, OnDestroy {
     return this.progressSteps[this.progressIndex];
   }
 
-  get loadingHint(): string {
-    if (this.elapsedSeconds < 8) {
-      return 'Primeiro carregamos os dados da corrida e depois iniciamos a escrita.';
-    }
-
-    if (this.elapsedSeconds < 20) {
-      return 'Modelos locais podem demorar um pouco mais, mesmo para respostas curtas.';
-    }
-
-    return 'O modelo está processando...';
-  }
-
   get waitingCommentaryText(): string {
     const messageIndex = Math.min(
-      Math.floor(this.elapsedSeconds / 6),
+      Math.floor(this.elapsedSeconds / 5),
       this.waitingMessages.length - 1,
     );
 
@@ -203,7 +191,7 @@ export class RaceCommentaryComponent implements OnChanges, OnDestroy {
       if (this.progressIndex < this.progressSteps.length - 1) {
         this.progressIndex += 1;
       }
-    }, 1400);
+    }, 5000);
   }
 
   private stopProgressSimulation(): void {

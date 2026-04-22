@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { ApiService, Race } from '../../services/api.service';
@@ -10,6 +10,7 @@ import { ApiService, Race } from '../../services/api.service';
   templateUrl: './race-list.component.html',
 })
 export class RaceListComponent implements OnInit {
+  @Input() selectedSessionKey?: number;
   @Output() raceSelected = new EventEmitter<Race>();
 
   races: Race[] = [];
