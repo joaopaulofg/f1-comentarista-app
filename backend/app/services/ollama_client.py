@@ -1,5 +1,6 @@
 import os
 import json
+import re
 from collections.abc import AsyncIterator
 
 import httpx
@@ -10,6 +11,24 @@ OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen3:0.6b")
 
 class OllamaClientError(RuntimeError):
     pass
+
+
+PARAGRAPH_LABEL_PATTERN = re.compile(r"^\s*par[aá]grafo\s*\d+\s*:\s*", re.IGNORECASE)
+
+
+def _remove_paragraph_labels(text: str) -> str:
+    lines = text.splitlines()
+    return "\n".join(PARAGRAPH_LABEL_PATTERN.sub("", line) for line in lines)
+
+
+def sanitize_commentary(text: str) -> str:
+    sanitized = _remove_paragraph_labels(text)
+    sanitized = re.sub(r"\n{3,}", "\n\n", sanitized)
+    return sanitized.strip()
+
+
+def sanitize_commentary_chunk(text: str) -> str:
+    return _remove_paragraph_labels(text)
 
 
 def build_commentary_prompt(race_title: str, podium_text: str, top10_text: str) -> str:
@@ -26,12 +45,16 @@ Regras obrigatórias:
 - não invente disputa de campeonato, estratégia, ultrapassagens ou contexto externo
 - não diga frases vagas como "as implicações para o futuro" ou "a dinâmica do torneio"
 - não repita a lista completa de posições
+- não escreva marcadores como "Parágrafo 1:", "Parágrafo 2:", "Primeiro parágrafo:" ou similares
 - prefira observações concretas sobre quem venceu, quem completou o pódio e quais equipes apareceram bem
+- use pontuação e espaçamento normais entre todas as palavras
+- nunca junte várias palavras sem espaço
 - mantenha entre 70 e 110 palavras no total
 
 Estrutura:
-Parágrafo 1: resumo do resultado com foco no vencedor e no pódio.
-Parágrafo 2: leitura breve do top-10, destacando 2 ou 3 nomes/equipes que chamam atenção.
+- no primeiro parágrafo, resuma o resultado com foco no vencedor e no pódio
+- no segundo parágrafo, faça uma leitura breve do top-10 destacando 2 ou 3 nomes/equipes
+- entregue apenas o texto final, sem títulos, sem enumeração e sem rótulos de parágrafo
 
 Pódio:
 {podium_text}
@@ -65,7 +88,9 @@ async def generate_commentary(race_title: str, podium_text: str, top10_text: str
     except httpx.HTTPError as exc:
         raise OllamaClientError("Falha ao consultar o Ollama") from exc
 
-    return data.get("response", "Não foi possível gerar comentário no momento.")
+    return sanitize_commentary(
+        data.get("response", "Não foi possível gerar comentário no momento.")
+    )
 
 
 async def stream_commentary(
@@ -94,7 +119,7 @@ async def stream_commentary(
                     chunk = json.loads(line)
                     text = chunk.get("response")
                     if text:
-                        yield text
+                        yield sanitize_commentary_chunk(text)
 
                     if chunk.get("done"):
                         break
