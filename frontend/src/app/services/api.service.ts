@@ -29,7 +29,7 @@ export interface CommentaryResponse {
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
-  private readonly baseUrl = 'http://localhost:8000/api';
+  private readonly baseUrl = 'http://localhost:8001/api';
 
   constructor(private readonly http: HttpClient) {}
 

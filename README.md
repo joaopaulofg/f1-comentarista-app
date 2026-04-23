@@ -79,10 +79,10 @@ source .venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 cp .env.example .env
-uvicorn app.main:app --reload --port 8000
+uvicorn app.main:app --reload --port 8001
 ```
 
-Backend disponível em `http://localhost:8000`.
+Backend disponível em `http://localhost:8001`.
 
 ### 4. Rodar o frontend
 ```bash
