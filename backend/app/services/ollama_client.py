@@ -14,11 +14,20 @@ class OllamaClientError(RuntimeError):
 
 
 PARAGRAPH_LABEL_PATTERN = re.compile(r"^\s*par[aá]grafo\s*\d+\s*:\s*", re.IGNORECASE)
+META_OPENING_PATTERN = re.compile(
+    r"^\s*(no|em)\s+(primeiro|segundo)\s+par[aá]grafo\s*,?\s*",
+    re.IGNORECASE,
+)
 
 
 def _remove_paragraph_labels(text: str) -> str:
     lines = text.splitlines()
-    return "\n".join(PARAGRAPH_LABEL_PATTERN.sub("", line) for line in lines)
+    cleaned_lines = []
+    for line in lines:
+        line = PARAGRAPH_LABEL_PATTERN.sub("", line)
+        line = META_OPENING_PATTERN.sub("", line)
+        cleaned_lines.append(line)
+    return "\n".join(cleaned_lines)
 
 
 def sanitize_commentary(text: str) -> str:
@@ -33,28 +42,33 @@ def sanitize_commentary_chunk(text: str) -> str:
 
 def build_commentary_prompt(race_title: str, podium_text: str, top10_text: str) -> str:
     return f"""
-Você é um comentarista brasileiro de Fórmula 1.
-Escreva um comentário curto, natural e fluido sobre {race_title}, em português do Brasil.
+Escreva uma nota 2 paragrafos pós-corrida sobre {race_title}. Inicie comentando sobre a corrida no geral e depois foque no resultado do pódio. Depois, destaque 2 ou 3 nomes/equipes do top 10 que chamaram atenção. Mantenha o texto entre 80 e 100 palavras. Evite usar linguagem robótica ou formal demais. Use um tom de jornalista esportivo, natural, direto e concreto.
 
-Regras obrigatórias:
-- escreva 2 parágrafos curtos
-- soe humano e jornalístico, não robótico
-- cite os 3 pilotos do pódio no primeiro parágrafo
-- cite 2 ou 3 destaques reais do top-10 no segundo parágrafo
-- use apenas os dados fornecidos
-- não invente disputa de campeonato, estratégia, ultrapassagens ou contexto externo
-- não diga frases vagas como "as implicações para o futuro" ou "a dinâmica do torneio"
-- não repita a lista completa de posições
-- não escreva marcadores como "Parágrafo 1:", "Parágrafo 2:", "Primeiro parágrafo:" ou similares
-- prefira observações concretas sobre quem venceu, quem completou o pódio e quais equipes apareceram bem
-- use pontuação e espaçamento normais entre todas as palavras
-- nunca junte várias palavras sem espaço
-- mantenha entre 70 e 110 palavras no total
+Idioma: português do Brasil.
+Tom: jornalista esportivo, natural, direto e concreto.
 
-Estrutura:
-- no primeiro parágrafo, resuma o resultado com foco no vencedor e no pódio
-- no segundo parágrafo, faça uma leitura breve do top-10 destacando 2 ou 3 nomes/equipes
-- entregue apenas o texto final, sem títulos, sem enumeração e sem rótulos de parágrafo
+Escreva somente o comentário final.
+Não explique o que está fazendo.
+Não use frases como:
+- "No primeiro parágrafo"
+- "No segundo parágrafo"
+- "Parágrafo 1"
+- "Parágrafo 2"
+- "Em resumo"
+
+Use apenas os dados abaixo.
+Não invente estratégia, campeonato, ultrapassagens, clima, punições ou contexto externo.
+Não transforme o texto em lista.
+Não repita o top 10 inteiro.
+Não use linguagem robótica.
+
+Objetivo do texto:
+- abrir com o vencedor e fechar o pódio
+- depois destacar 2 ou 3 nomes/equipes do top 10 que chamam atenção
+- manter o texto curto, com 2 blocos curtos e boa fluidez
+- ficar entre 60 e 90 palavras
+
+Escreva como se fosse uma nota publicada logo após a corrida.
 
 Pódio:
 {podium_text}
